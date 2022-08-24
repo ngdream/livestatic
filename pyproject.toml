@@ -3,10 +3,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "yankee_ngdream"
-version = "0.0.1"
+name = "livestatic"
+version = "0.0.2"
 authors = [
-  { name="elodream", email="nguewofoss@gmail.com" },
+  { name="ngdream", email="nguewofoss@gmail.com" },
 ]
 description = "serve static page very easily"
 readme = "README.md"
@@ -19,5 +19,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/pypa/sampleproject"
-"Bug Tracker" = "https://github.com/pypa/sampleproject/issues"
+"Homepage" = "https://github.com/ngdream/yankee"
+"Bug Tracker" = "https://github.com/ngdream/yankee/issues"
