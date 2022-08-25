@@ -4,7 +4,6 @@ from importlib.resources import path
 import sys
 import time
 import mimetypes
-
 commands={}#list of command
 
 def runserverwithargs():
