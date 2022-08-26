@@ -3,7 +3,7 @@
 
 <h1>LIVESTATIC</h1>
 
-is a new  python web framework made for frontend development using dreamui  build by experienced developers
+is a new  python web framework made for frontend development
 
 <h2>with LIVESTATIC<h2/>
 
