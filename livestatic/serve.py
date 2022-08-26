@@ -2,11 +2,14 @@
 
 from colorama import Fore,init# Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from cefpython3 import cefpython as cef
 import sys
 import time
 import mimetypes
 import os
+import threading
 
+cef.Initialize()
 
 
 init()
@@ -49,16 +52,19 @@ class MyServer(BaseHTTPRequestHandler):
         else:
             self.send_response(200)
             self.send_header("Content-type", "text/html")
-            contentfile=str()
+            contentfile=object()
             if self.path =="/":
                 if os.path.exists("index.html"):
                     contentfile = open("index.html", 'rb').read()
+                    print("yo")
                 else:
+                    print("ok")
                     contentfile="""
                 <html>
-
+                <H1>merci de faire confiance en elodream<h1/>
                 </html>
-                """
+                """.encode()
+                
             else:
                 filename = self.path[1:]
                 if os.path.exists(filename):
@@ -76,12 +82,24 @@ class MyServer(BaseHTTPRequestHandler):
 
         print(Fore.RESET)
 
+def main(url):
+    check_versions()
+    sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+    cef.CreateBrowserSync(url=url,
+                          window_title="")
+    cef.MessageLoop()
+    cef.Shutdown()
+
+
+def check_versions():
+    ver = cef.GetVersion()
+    assert cef.__version__ >= "57.0", "CEF Python v57.0+ required to run this"
+
 
 
 def runserver(hostname,port):
     """this function lauch the server"""
     webserver = HTTPServer((hostname,port),MyServer)
-    
     print("%d/%d/%d\n" %(time.localtime().tm_year,time.localtime().tm_mon,time.localtime().tm_mday)
         ,"Server started http://%s:%s" % (hostname, port))
     try:
@@ -92,9 +110,14 @@ def runserver(hostname,port):
     print("Server stopped.")
 
 
-def launch():
+def launch(localhost="localhost",port=8000):
+
     if(sys.argv.__len__()==1):
-        runserver("localhost",8000)
+        serve = threading.Thread(target=runserver, args=(localhost,port))
+        serve.start()
+        print("server is launch")
+        main("localhost:8000")
+        serve.join()
     else:
        
         if sys.argv.__len__()>  1:
