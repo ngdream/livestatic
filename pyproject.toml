@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling","colorama"]
 build-backend = "hatchling.build"
 
 [project]
@@ -19,5 +19,5 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/ngdream/yankee"
-"Bug Tracker" = "https://github.com/ngdream/yankee/issues"
+"Homepage" = "https://github.com/ngdream/livestatic"
+"Bug Tracker" = "https://github.com/ngdream/livestatic/issues"

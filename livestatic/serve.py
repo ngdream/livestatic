@@ -1,10 +1,19 @@
-# Python 3 server example
+"""LIve static - mave your developement cool"""
+
+from colorama import Fore,init# Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from importlib.resources import path
 import sys
 import time
 import mimetypes
+import os
+
+
+
+init()
+
 commands={}#list of command
+
+
 
 def runserverwithargs():
     if sys.argv[1]:
@@ -18,34 +27,63 @@ def addcommand(commandname:str,operation):
     This function adds a command to the server.
     """
     commands[commandname]=operation
-
-
 class MyServer(BaseHTTPRequestHandler):
     """server class"""    
     def do_GET(self):
-        if path=="/":
+        mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]
+        print(mimetype);
+        if(mimetype!=None and mimetype!='text/html'):
+            filename = self.path[1:]
+            if os.path.exists(filename):
+                file=open(filename, "rb") 
+                filestream=file.read()
+                self.send_response(200)
+                self.send_header('Content-type',mimetype)
+                self.end_headers()
+                self.wfile.write(filestream)
+                print(Fore.GREEN+"success")
+            else:
+                self.send_response(400)
+                print(Fore.YELLOW+"bad request : cannot find file %s" %filename)
+                
+        else:
             self.send_response(200)
-            self.end_headers()
             self.send_header("Content-type", "text/html")
-            contentfile = open("index.html", 'rb').read()
+            contentfile=str()
+            if self.path =="/":
+                if os.path.exists("index.html"):
+                    contentfile = open("index.html", 'rb').read()
+                else:
+                    contentfile="""
+                <html>
+
+                </html>
+                """
+            else:
+                filename = self.path[1:]
+                if os.path.exists(filename):
+                    contentfile=open(filename, "rb") .read()
+                    self.send_response(200)
+                    self.send_header('Content-type','text/html')
+                    print(Fore.GREEN+"success")
+                else:
+                    self.send_response(400)
+                    print(Fore.YELLOW+"bad request : cannot find file %s" %filename)
+            self.end_headers()
             self.wfile.write(contentfile)
 
-        else:
-            print("yo")
-            imgname = self.path
-            imgname = imgname[1:]
-            imgfile = open(imgname, 'rb').read()
-            mimetype = mimetypes.MimeTypes().guess_type(imgname)[0]
-            self.send_response(200)
-            self.send_header('Content-type', 'image')
-            self.end_headers()
-            self.wfile.write(imgfile)
+            print("hey")
+
+        print(Fore.RESET)
 
 
-"""this function lauch the server"""
-def runserver(hostname,port:int):
+
+def runserver(hostname,port):
+    """this function lauch the server"""
     webserver = HTTPServer((hostname,port),MyServer)
-    print("Server started http://%s:%s" % (hostname, port))
+    
+    print("%d/%d/%d\n" %(time.localtime().tm_year,time.localtime().tm_mon,time.localtime().tm_mday)
+        ,"Server started http://%s:%s" % (hostname, port))
     try:
        webserver.serve_forever()
     except:
@@ -53,11 +91,10 @@ def runserver(hostname,port:int):
     webserver.server_close()
     print("Server stopped.")
 
-          
+
 def launch():
     if(sys.argv.__len__()==1):
         runserver("localhost",8000)
-        print("yo")
     else:
        
         if sys.argv.__len__()>  1:
@@ -65,12 +102,9 @@ def launch():
                 c=sys.argv[1]
                 sys.argv.pop(0)
                 commands[c]()
-        
 
 
 addcommand("runserver",runserverwithargs)
     
-        
-
 if __name__ == "__main__":        
     launch()
