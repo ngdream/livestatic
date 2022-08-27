@@ -1,13 +1,21 @@
 ![](https://github.com/Elodream/elodata/blob/26e183f18c4dda21a97da6bbf130913fb8df5c99/data/livestatic/social.png)
 
 
-<h1>LIVESTATIC</h1>
+<h1 align="center">LIVESTATIC</h1>        
+is a new  python web framework made for frontend development
 
-is a new  python web framework made for frontend development using dreamui  build by experienced developers
+<h2>Installation</h2>
 
-<h2>with LIVESTATIC<h2/>
+livestatic is a python package so if you want the current stable version you need to use pip 
+           
+```
+pip install live 
+```
+<h2> authors</h2>
 
-you can made  made modern web design just with html css 
+- ngdream
+
+
 
 
 
