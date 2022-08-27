@@ -1,61 +1,25 @@
-import http
-from importlib.resources import path
 from colorama import Fore,init# Python 3 server example
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from cefpython3 import cefpython as cef
+from http.server import  BaseHTTPRequestHandler, HTTPServer
+from views import responses,exceptions
+import webapp
+
+import config
 import sys
 import time
 import mimetypes
 import os
 import threading
-import platform
+import urls
+
 init()
-_urldata={
-
-}
-
-_namebind={
-
-}
-def  add(url:str,view,name=None):
-    _namebind[name]=url
-    _urldata[url]=view
-
 
 def default_index_view():
-    return """
-    <h1>thanks for using </h1>
-    """.encode()
-add("/",default_index_view)
-
-def view():
-    return render("index.html")
-add("/junior",view)
-commands={}#list of command
-template={
-   "directories":["cc"] 
-}
-
-
-def render(htmlfile):
-    for dir in template["directories"]:
-        tdir=os.path.join(dir,htmlfile)
-        print(tdir)
-        if  os.path.exists(tdir):
-            file=open(tdir, "rb")
-            print("yoll")
-            filestream=file.read()
-            return filestream
     
+    return responses.htmlresponse("index.html")
 
+urls.add("/",default_index_view)
 
-
-
-def runserverwithargs():
-    if sys.argv[1]:
-        servedata=sys.argv[1].split(":")
-        print(servedata)
-        runserver(servedata[0],int(servedata[1]))
+commands={}#list of command
 
 
 def addcommand(commandname:str,operation):
@@ -63,12 +27,12 @@ def addcommand(commandname:str,operation):
     This function adds a command to the server.
     """
     commands[commandname]=operation
-class MyServer(BaseHTTPRequestHandler):
+class defaultserver(BaseHTTPRequestHandler):
     """server class"""    
     def do_GET(self):
+        
         mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]
-        print(mimetype);
-        if(mimetype!=None ):
+        if(self.path not in urls._urldata.keys() ):
             filename = self.path[1:]
             if os.path.exists(filename):
                 filestream=open(filename).read()
@@ -81,44 +45,27 @@ class MyServer(BaseHTTPRequestHandler):
                 self.send_response(400)
                 print(Fore.YELLOW+"bad request : cannot find file %s" %filename)
                 
-        else:
-            self.send_response(200)
-            self.send_header("Content-type", "text/html")
-            httpcontent=str()
-            if  self.path in _urldata.keys():
-                print("yo")
-                httpcontent=_urldata[self.path]()
+        elif self.path in urls._urldata.keys():
+            try:
+                self.send_response(200)
+                response=urls._urldata[self.path]()
+                self.send_header("Content-type", response.TYPE)
+                self.end_headers()
+                self.wfile.write(response.content)
+            except exceptions.Error404 as error:
+                self.send_response(400)
+                print(Fore.YELLOW+"bad request")
+            except exceptions.Error403 as error:
+                self.send_response(300)
+                print(Fore.RED+"access denied")
 
-            self.end_headers()
-            self.wfile.write(httpcontent)
-
-            print("hey")
 
         print(Fore.RESET)
 
-def main(url):
-    check_versions()
-    sys.excepthook = cef.ExceptHook   
-    cef.CreateBrowserSync(url=url,
-                          window_title="",)
-    cef.MessageLoop()
-    cef.Shutdown()
-
-
-def check_versions():
-    ver = cef.GetVersion()
-    print("[hello_world.py] CEF Python {ver}".format(ver=ver["version"]))
-    print("[hello_world.py] Chromium {ver}".format(ver=ver["chrome_version"]))
-    print("[hello_world.py] CEF {ver}".format(ver=ver["cef_version"]))
-    print("[hello_world.py] Python {ver} {arch}".format(
-           ver=platform.python_version(),
-           arch=platform.architecture()[0]))
-    assert cef.__version__ >= "57.0", "CEF Python v57.0+ required to run this"
-
 def runserver(hostname,port):
-    """this function lauch the server"""
-    webserver = HTTPServer((hostname,port),MyServer)
-    print("%d/%d/%d\n" %(time.localtime().tm_year,time.localtime().tm_mon,time.localtime().tm_mday)
+    #launch server
+    webserver = HTTPServer((hostname,port),defaultserver)
+    print("%d/%d/%d\n"%(time.localtime().tm_year,time.localtime().tm_mon,time.localtime().tm_mday)
         ,"Server started http://%s:%s" % (hostname, port))
     try:
        webserver.serve_forever()
@@ -134,7 +81,9 @@ def launch(localhost="localhost",port=8000):
         serve = threading.Thread(target=runserver, args=(localhost,port))
         serve.start()
         print("server is launch")
-        #main("localhost:8000")
+        if config.make_app:
+            
+            webapp.runwebapp("%s:%s"%(localhost,port))
         serve.join()
     else:
        
@@ -143,9 +92,6 @@ def launch(localhost="localhost",port=8000):
                 c=sys.argv[1]
                 sys.argv.pop(0)
                 commands[c]()
-
-
-addcommand("runserver",runserverwithargs)
     
 if __name__ == "__main__":        
     launch()

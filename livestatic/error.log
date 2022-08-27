@@ -1,0 +1,11 @@
+
+[2022-08-27 14:09:55] Traceback (most recent call last):
+  File "a:\code\githubparticipation\yankee\livestatic\serve.py", line 89, in <module>
+    launch()
+  File "a:\code\githubparticipation\yankee\livestatic\serve.py", line 78, in launch
+    webapp.runwebapp("%s:%s"%(localhost,port))
+  File "a:\code\githubparticipation\yankee\livestatic\webapp.py", line 5, in runwebapp
+    cef.CreateBrowserSync(url=url,
+  File "cefpython_py38.pyx", line 680, in cefpython_py38.CreateBrowserSync
+AssertionError: cefpython.CreateBrowserSync() may only be called on the UI thread
+
