@@ -66,7 +66,7 @@ def runserver(hostname,port):
     #launch server
     webserver = HTTPServer((hostname,port),defaultserver)
     print("%d/%d/%d\n"%(time.localtime().tm_year,time.localtime().tm_mon,time.localtime().tm_mday)
-        ,"Server started http://%s:%s" % (hostname, port))
+        ,"Server started http://%s:%s" %(hostname, port))
     try:
        webserver.serve_forever()
     except:
@@ -92,6 +92,7 @@ def launch(localhost="localhost",port=8000):
                 c=sys.argv[1]
                 sys.argv.pop(0)
                 commands[c]()
+ 
     
 if __name__ == "__main__":        
     launch()

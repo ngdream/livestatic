@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling","colorama"]
+requires = ["hatchling","colorama","cefpython3"]
 build-backend = "hatchling.build"
 
 [project]
 name = "livestatic"
-version = "0.0.5"
+version = "0.0.6"
 authors = [
   { name="ngdream", email="nguewofoss@gmail.com" },
 ]
