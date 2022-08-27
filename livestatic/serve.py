@@ -1,5 +1,5 @@
-"""LIve static - mave your developement cool"""
-
+import http
+from importlib.resources import path
 from colorama import Fore,init# Python 3 server example
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from cefpython3 import cefpython as cef
@@ -8,13 +8,46 @@ import time
 import mimetypes
 import os
 import threading
-
-cef.Initialize()
-
-
+import platform
 init()
+_urldata={
 
+}
+
+_namebind={
+
+}
+def  add(url:str,view,name=None):
+    _namebind[name]=url
+    _urldata[url]=view
+
+
+def default_index_view():
+    return """
+    <h1>thanks for using </h1>
+    """.encode()
+add("/",default_index_view)
+
+def view():
+    return render("index.html")
+add("/junior",view)
 commands={}#list of command
+template={
+   "directories":["cc"] 
+}
+
+
+def render(htmlfile):
+    for dir in template["directories"]:
+        tdir=os.path.join(dir,htmlfile)
+        print(tdir)
+        if  os.path.exists(tdir):
+            file=open(tdir, "rb")
+            print("yoll")
+            filestream=file.read()
+            return filestream
+    
+
 
 
 
@@ -35,11 +68,10 @@ class MyServer(BaseHTTPRequestHandler):
     def do_GET(self):
         mimetype = mimetypes.MimeTypes().guess_type(self.path)[0]
         print(mimetype);
-        if(mimetype!=None and mimetype!='text/html'):
+        if(mimetype!=None ):
             filename = self.path[1:]
             if os.path.exists(filename):
-                file=open(filename, "rb") 
-                filestream=file.read()
+                filestream=open(filename).read()
                 self.send_response(200)
                 self.send_header('Content-type',mimetype)
                 self.end_headers()
@@ -52,31 +84,13 @@ class MyServer(BaseHTTPRequestHandler):
         else:
             self.send_response(200)
             self.send_header("Content-type", "text/html")
-            contentfile=object()
-            if self.path =="/":
-                if os.path.exists("index.html"):
-                    contentfile = open("index.html", 'rb').read()
-                    print("yo")
-                else:
-                    print("ok")
-                    contentfile="""
-                <html>
-                <H1>merci de faire confiance en elodream<h1/>
-                </html>
-                """.encode()
-                
-            else:
-                filename = self.path[1:]
-                if os.path.exists(filename):
-                    contentfile=open(filename, "rb") .read()
-                    self.send_response(200)
-                    self.send_header('Content-type','text/html')
-                    print(Fore.GREEN+"success")
-                else:
-                    self.send_response(400)
-                    print(Fore.YELLOW+"bad request : cannot find file %s" %filename)
+            httpcontent=str()
+            if  self.path in _urldata.keys():
+                print("yo")
+                httpcontent=_urldata[self.path]()
+
             self.end_headers()
-            self.wfile.write(contentfile)
+            self.wfile.write(httpcontent)
 
             print("hey")
 
@@ -84,18 +98,22 @@ class MyServer(BaseHTTPRequestHandler):
 
 def main(url):
     check_versions()
-    sys.excepthook = cef.ExceptHook  # To shutdown all CEF processes on error
+    sys.excepthook = cef.ExceptHook   
     cef.CreateBrowserSync(url=url,
-                          window_title="")
+                          window_title="",)
     cef.MessageLoop()
     cef.Shutdown()
 
 
 def check_versions():
     ver = cef.GetVersion()
+    print("[hello_world.py] CEF Python {ver}".format(ver=ver["version"]))
+    print("[hello_world.py] Chromium {ver}".format(ver=ver["chrome_version"]))
+    print("[hello_world.py] CEF {ver}".format(ver=ver["cef_version"]))
+    print("[hello_world.py] Python {ver} {arch}".format(
+           ver=platform.python_version(),
+           arch=platform.architecture()[0]))
     assert cef.__version__ >= "57.0", "CEF Python v57.0+ required to run this"
-
-
 
 def runserver(hostname,port):
     """this function lauch the server"""
@@ -116,7 +134,7 @@ def launch(localhost="localhost",port=8000):
         serve = threading.Thread(target=runserver, args=(localhost,port))
         serve.start()
         print("server is launch")
-        main("localhost:8000")
+        #main("localhost:8000")
         serve.join()
     else:
        
