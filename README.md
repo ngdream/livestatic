@@ -9,7 +9,7 @@ is a new  python web framework made for frontend development
 livestatic is a python package so if you want the current stable version you need to use pip 
            
 ```
-pip install live 
+pip install livestatic 
 ```
 <h2> authors</h2>
 
